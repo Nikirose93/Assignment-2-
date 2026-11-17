@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Module 2 – Assignment 2 | Question 1</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+<header><div class="eyebrow">Dynamic Websites &amp; Applications • Module 2 – Assignment 2</div><h1>Question 1: Parsing JSON</h1><nav><a href="question1.html" aria-current="page">Question 1</a><a href="question2.html">Question 2</a><a href="question3.html">Question 3</a></nav></header>
+<main><section class="panel"><h2>Employee Names</h2><p>Using <code>JSON.parse()</code>, the JSON string is converted to a JavaScript object and the employees are displayed as an unordered list inside the <code>demo</code> div.</p><div id="demo"></div></section></main>
+<footer>Module 2 • Assignment 2 • Question 1 (10 marks)</footer>
+<script>
+'use strict';
+// JSON string supplied in the assignment.
+let text = '{ "employees" : [' +
+  '{ "firstName":"John" , "lastName":"Doe" },' +
+  '{ "firstName":"Anna" , "lastName":"Smith" },' +
+  '{ "firstName":"Peter" , "lastName":"Jones" } ]}';
+
+const employeeData = JSON.parse(text);
+const employeeList = `<ul class="result-list">
+  ${employeeData.employees.map(employee => `<li>${employee.firstName} ${employee.lastName}</li>`).join('')}
+</ul>`;
+document.getElementById('demo').insertAdjacentHTML('beforeend', employeeList);
+</script>
+</body></html>

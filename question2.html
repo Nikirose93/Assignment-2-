@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Module 2 – Assignment 2 | Question 2</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+<header><div class="eyebrow">Dynamic Websites &amp; Applications • Module 2 – Assignment 2</div><h1>Question 2: Fun With Forms</h1><nav><a href="question1.html">Question 1</a><a href="question2.html" aria-current="page">Question 2</a><a href="question3.html">Question 3</a></nav></header>
+<main><section class="panel"><h2>Fun With Forms</h2><p class="note">All visible form fields are required. Card details are enabled only when Visa or MasterCard is selected. When shipping differs from billing, additional fields appear.</p>
+<form id="checkoutForm" novalidate>
+<fieldset><legend>Billing Information</legend><div class="fields">
+<label for="billingName">Name</label><div class="field-wrap"><input id="billingName" name="billingName" type="text" autocomplete="name"></div>
+<label for="billingEmail">Email</label><div class="field-wrap"><input id="billingEmail" name="billingEmail" type="email" autocomplete="email"></div>
+<label for="billingAddress">Address</label><div class="field-wrap"><input id="billingAddress" name="billingAddress" type="text" autocomplete="street-address"></div>
+<label for="billingCity">City</label><div class="field-wrap"><input id="billingCity" name="billingCity" type="text" autocomplete="address-level2"></div>
+<label for="billingState">State/Province</label><div class="field-wrap"><input id="billingState" name="billingState" type="text" autocomplete="address-level1"></div>
+<label for="billingPostal">Postal Code</label><div class="field-wrap"><input id="billingPostal" name="billingPostal" type="text" autocomplete="postal-code"></div>
+<label for="billingCountry">Country</label><div class="field-wrap"><select id="billingCountry" name="billingCountry"><option value="">Choose your country</option><option value="Jamaica">Jamaica</option><option value="United States">United States</option><option value="Canada">Canada</option><option value="United Kingdom">United Kingdom</option><option value="Other">Other</option></select></div>
+<label>Payment Method</label><div class="field-wrap"><div class="radio-row"><label><input type="radio" name="paymentMethod" value="paypal" checked> PayPal</label><label><input type="radio" name="paymentMethod" value="visa"> Visa</label><label><input type="radio" name="paymentMethod" value="mastercard"> MasterCard</label></div><div id="paymentError" class="radio-error"></div></div>
+<label for="cardNumber">Card Number</label><div class="field-wrap card-group"><input id="cardNumber" name="cardNumber" type="text" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456" disabled></div>
+<label for="expirationDate">Expiration Date</label><div class="field-wrap card-group"><input id="expirationDate" name="expirationDate" type="text" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY" maxlength="5" disabled></div>
+</div></fieldset>
+<fieldset><legend>Shipping Information</legend><label class="checkbox-line" for="sameAsBilling"><input type="checkbox" id="sameAsBilling" name="sameAsBilling" checked> Same as billing</label>
+<div id="shippingFields" hidden><p class="note">Complete these fields when shipping and billing addresses are different.</p><div class="fields">
+<label for="shippingName">Name</label><div class="field-wrap"><input id="shippingName" name="shippingName" type="text" autocomplete="shipping name" disabled></div>
+<label for="shippingAddress">Address</label><div class="field-wrap"><input id="shippingAddress" name="shippingAddress" type="text" autocomplete="shipping street-address" disabled></div>
+<label for="shippingCity">City</label><div class="field-wrap"><input id="shippingCity" name="shippingCity" type="text" autocomplete="shipping address-level2" disabled></div>
+<label for="shippingState">State/Province</label><div class="field-wrap"><input id="shippingState" name="shippingState" type="text" autocomplete="shipping address-level1" disabled></div>
+<label for="shippingPostal">Postal Code</label><div class="field-wrap"><input id="shippingPostal" name="shippingPostal" type="text" autocomplete="shipping postal-code" disabled></div>
+<label for="shippingCountry">Country</label><div class="field-wrap"><select id="shippingCountry" name="shippingCountry" disabled><option value="">Choose your country</option><option value="Jamaica">Jamaica</option><option value="United States">United States</option><option value="Canada">Canada</option><option value="United Kingdom">United Kingdom</option><option value="Other">Other</option></select></div>
+</div></div></fieldset>
+<div class="actions"><button class="btn" type="submit">Validate Form</button><span id="formMessage" class="message" role="status" aria-live="polite"></span></div>
+</form></section></main>
+<footer>Module 2 • Assignment 2 • Question 2 (30 marks)</footer>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.21.0/dist/jquery.validate.min.js"></script>
+<script>
+'use strict';
+// jQuery Validate Plugin is loaded from a public CDN, so an internet connection is required.
+$(function () {
+  if (!$.fn.validate) {
+    $('#formMessage').css('color', '#b42318').text('Validation library could not load. Check your internet connection.');
+    $('#checkoutForm button[type=submit]').prop('disabled', true);
+    return;
+  }
+  const cardInputNames = ['cardNumber', 'expirationDate'];
+  const shippingInputNames = ['shippingName','shippingAddress','shippingCity','shippingState','shippingPostal','shippingCountry'];
+  const isCardPayment = () => $('input[name="paymentMethod"]:checked').val() !== 'paypal';
+  const isDifferentShipping = () => !$('#sameAsBilling').is(':checked');
+
+  function updatePayment() {
+    const cardEnabled = isCardPayment();
+    cardInputNames.forEach(name => $(`[name="${name}"]`).prop('disabled', !cardEnabled));
+    $('.card-group').toggleClass('disabled', !cardEnabled);
+    if (!cardEnabled) {
+      cardInputNames.forEach(name => { const field = $(`[name="${name}"]`); field.val(''); field.removeClass('error'); field.siblings('label.error').remove(); });
+    }
+    $('#formMessage').text('');
+  }
+  function updateShipping() {
+    const show = isDifferentShipping();
+    $('#shippingFields').prop('hidden', !show);
+    shippingInputNames.forEach(name => $(`[name="${name}"]`).prop('disabled', !show));
+    if (!show) {
+      shippingInputNames.forEach(name => { const field = $(`[name="${name}"]`); field.removeClass('error'); field.siblings('label.error').remove(); });
+    }
+    $('#formMessage').text('');
+  }
+  $('input[name="paymentMethod"]').on('change', updatePayment);
+  $('#sameAsBilling').on('change', updateShipping);
+  updatePayment(); updateShipping();
+
+  // Card expiry format: two-digit month and two-digit year, with a real month 01–12.
+  $.validator.addMethod('expiryDate', function(value, element) {
+    if (this.optional(element)) return true;
+    const match = /^(0[1-9]|1[0-2])\/(\d{2})$/.exec(value);
+    if (!match) return false;
+    const now = new Date();
+    const year = 2000 + Number(match[2]);
+    const month = Number(match[1]);
+    return year > now.getFullYear() || (year === now.getFullYear() && month >= now.getMonth() + 1);
+  }, 'Enter a valid future expiry date (MM/YY).');
+  $.validator.addMethod('cardDigits', function(value, element) {
+    return this.optional(element) || /^\d{13,19}$/.test(value.replace(/[ -]/g, ''));
+  }, 'Enter a card number containing 13–19 digits.');
+
+  const required = {required: true};
+  $('#checkoutForm').validate({
+    ignore: ':disabled, :hidden',
+    rules: {
+      billingName: required,
+      billingEmail: {required: true, email: true},
+      billingAddress: required, billingCity: required, billingState: required,
+      billingPostal: required, billingCountry: required,
+      paymentMethod: required,
+      cardNumber: {required: {depends: isCardPayment}, cardDigits: true},
+      expirationDate: {required: {depends: isCardPayment}, expiryDate: true},
+      shippingName: {required: {depends: isDifferentShipping}},
+      shippingAddress: {required: {depends: isDifferentShipping}},
+      shippingCity: {required: {depends: isDifferentShipping}},
+      shippingState: {required: {depends: isDifferentShipping}},
+      shippingPostal: {required: {depends: isDifferentShipping}},
+      shippingCountry: {required: {depends: isDifferentShipping}}
+    },
+    messages: {
+      billingName: 'Please enter your full name.',
+      billingEmail: {required:'Please enter your email address.',email:'Please enter a valid email address.'},
+      billingAddress: 'Please enter your billing address.',
+      billingCity: 'Please enter your city.',
+      billingState: 'Please enter your state or province.',
+      billingPostal: 'Please enter your postal code.',
+      billingCountry: 'Please choose your country.',
+      paymentMethod: 'Please choose a payment method.',
+      cardNumber: {required:'Please enter your card number.'},
+      expirationDate: {required:'Please enter the expiration date.'},
+      shippingName: 'Please enter the recipient name.',
+      shippingAddress: 'Please enter the shipping address.',
+      shippingCity: 'Please enter the shipping city.',
+      shippingState: 'Please enter the shipping state or province.',
+      shippingPostal: 'Please enter the shipping postal code.',
+      shippingCountry: 'Please choose the shipping country.'
+    },
+    errorPlacement: function(error, element) {
+      if (element.attr('name') === 'paymentMethod') error.appendTo('#paymentError');
+      else error.insertAfter(element);
+    },
+    invalidHandler: function () { $('#formMessage').css('color', '#b42318').text('Please fix the highlighted fields.'); },
+    submitHandler: function(form, event) {
+      if (event) event.preventDefault();
+      $('#formMessage').css('color', '#116534').text('Form validation successful! (Demo only; no payment was processed.)');
+      return false;
+    }
+  });
+});
+</script>
+</body></html>
